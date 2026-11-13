@@ -1,0 +1,8 @@
+# Danh sách thư viện cần cài đặt
+# Chạy: pip install -r requirements.txt
+
+customtkinter
+pymongo
+bcrypt
+python-dotenv
+
