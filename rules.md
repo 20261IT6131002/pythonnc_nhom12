@@ -8,15 +8,15 @@
 
 | Module | File | Người phụ trách |
 |--------|------|-----------------|
-| Kết nối DB | `database/connection.py` | |
-| Repo người dùng | `database/user_repo.py` | |
-| Repo ghi chú | `database/note_repo.py` | |
-| Model | `models/user.py`, `models/note.py` | |
-| Xác thực | `controllers/auth_controller.py` | |
-| Ghi chú | `controllers/note_controller.py` | |
-| View đăng nhập / đăng ký | `views/login_view.py`, `views/register_view.py` | |
-| View chính | `views/main_view.py` | |
-| Điều hướng & tích hợp | `main.py` _(chỉ chứa class `App`)_, `config.py` | |
+| Kết nối DB | `database/connection.py` | Trần Văn Trọng |
+| Repo người dùng | `database/user_repo.py` | Bùi Anh Duy |
+| Repo ghi chú | `database/note_repo.py` | Bùi Anh Duy |
+| Model | `models/user.py`, `models/note.py` | Trần Văn Trọng |
+| Xác thực | `controllers/auth_controller.py` | Nguyễn Minh Tú |
+| Ghi chú | `controllers/note_controller.py` | Nguyễn Đình Trung |
+| View đăng nhập / đăng ký | `views/login_view.py`, `views/register_view.py` | Nguyễn Minh Tú, Nguyễn Đình Trung |
+| View chính | `views/main_view.py` | Nguyễn Đình Trung |
+| Điều hướng & tích hợp | `main.py` _(chỉ chứa class `App`)_, `config.py` | Đặng Quang Anh |
 
 > **Quy tắc:** mỗi người **chỉ chỉnh sửa file được phân công**. Không tự ý sửa `main.py` hay `config.py`.
 >
