@@ -1,9 +1,19 @@
-# models/user.py — Dataclass đại diện cho người dùng
-#
-# Triển khai:
-#   - Dataclass User với các field:
-#       + id: str          (ObjectId chuyển sang string)
-#       + username: str
-#   - Hàm from_dict(doc: dict) -> User
-#       + Chuyển MongoDB document thành User object
+
+from dataclasses import dataclass
+
+
+@dataclass
+class User:
+    id: str
+    username: str
+    fullname: str
+
+    @staticmethod
+    def from_dict(doc: dict) -> "User":
+        return User(
+            id=str(doc.get("_id", doc.get("id", ""))),
+            username=doc.get("username", ""),
+            fullname=doc.get("fullname", "")
+        )
+
 
