@@ -1,15 +1,27 @@
-# models/note.py — Dataclass đại diện cho ghi chú
-#
-# Triển khai:
-#   - Dataclass Note với các field:
-#       + id: str
-#       + user_id: str
-#       + title: str
-#       + label: str       ("Công việc" | "Học tập" | "Cá nhân" | "Khác")
-#       + content: str
-#       + starred: bool
-#       + deleted: bool
-#       + created: str     (định dạng "YYYY-MM-DD HH:MM")
-#   - Hàm from_dict(doc: dict) -> Note
-#       + Chuyển MongoDB document thành Note object
 
+from dataclasses import dataclass
+
+
+@dataclass
+class Note:
+    id: str
+    user_id: str
+    title: str
+    label: str
+    content: str
+    starred: bool
+    deleted: bool
+    created: str
+
+    @staticmethod
+    def from_dict(doc: dict) -> "Note":
+        return Note(
+            id=str(doc.get("_id", doc.get("id", ""))),
+            user_id=str(doc.get("user_id", "")),
+            title=doc.get("title", ""),
+            label=doc.get("label", "Khác"),
+            content=doc.get("content", ""),
+            starred=doc.get("starred", False),
+            deleted=doc.get("deleted", False),
+            created=doc.get("created", "")
+        )
