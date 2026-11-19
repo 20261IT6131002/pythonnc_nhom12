@@ -1,74 +1,178 @@
-# views/login_view.py — Màn hình đăng nhập
-
 import customtkinter as ctk
+
 from config import (
-    ACCENT, ACCENT_HOVER, MAIN_BG, SURFACE, SURFACE_HOVER, BORDER,
-    TEXT, MUTED, ERROR_COLOR,
-    FONT_TITLE, FONT_LABEL, FONT_SMALL, FONT_TINY,
+    ACCENT,
+    ACCENT_HOVER,
+    BORDER,
+    ERROR_COLOR,
+    FONT_FAMILY,
+    FONT_SMALL,
+    FONT_TINY,
+    FONT_TITLE,
+    MAIN_BG,
+    MUTED,
+    SURFACE,
+    SURFACE_HOVER,
+    TEXT,
 )
+from controllers.auth_controller import AuthController
+from models.user import User
 
 
 class LoginView(ctk.CTkFrame):
-    """Màn hình đăng nhập."""
+    def __init__(self, master, on_login, on_switch_register, on_toggle_mode=None, error: str = ""):
+        super().__init__(master, fg_color="transparent")
+        self.on_login = on_login
+        self.on_switch_register = on_switch_register
+        self.on_toggle_mode = on_toggle_mode
 
-    def __init__(self, master, on_login=None, on_register=None):
-        super().__init__(master, fg_color=MAIN_BG, corner_radius=0)
-        self.on_login    = on_login    or (lambda: None)
-        self.on_register = on_register or (lambda: None)
-        self._build()
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
 
-    def _build(self):
-        card = ctk.CTkFrame(self, fg_color=SURFACE, corner_radius=14,
-                            border_width=1, border_color=BORDER,
-                            width=400, height=460)
-        card.place(relx=0.5, rely=0.5, anchor="center")
-        card.grid_propagate(False)
+        card = ctk.CTkFrame(
+            self,
+            width=440,
+            corner_radius=10,
+            fg_color=SURFACE,
+            border_width=1,
+            border_color=BORDER,
+        )
+        card.grid(row=0, column=0, padx=24, pady=24)
+        card.grid_columnconfigure(0, weight=1)
 
-        # Logo
-        ctk.CTkLabel(card, text="📝", font=("Segoe UI", 44)).pack(pady=(40, 4))
-        ctk.CTkLabel(card, text="Ghi chú", font=FONT_TITLE,
-                     text_color=TEXT).pack()
-        ctk.CTkLabel(card, text="Đăng nhập để tiếp tục",
-                     font=FONT_SMALL, text_color=MUTED).pack(pady=(2, 28))
+        ctk.CTkLabel(
+            card,
+            text="Ghi chú",
+            text_color=ACCENT,
+            font=(FONT_FAMILY, 13, "bold"),
+        ).pack(pady=(28, 4))
 
-        inner = ctk.CTkFrame(card, fg_color="transparent")
-        inner.pack(fill="x", padx=36)
+        ctk.CTkLabel(
+            card,
+            text="Chào mừng trở lại",
+            text_color=TEXT,
+            font=FONT_TITLE,
+        ).pack(pady=(0, 4))
 
-        # Username
-        ctk.CTkLabel(inner, text="Tên đăng nhập", anchor="w",
-                     font=FONT_LABEL, text_color=TEXT).pack(fill="x")
-        ctk.CTkEntry(inner, height=38, corner_radius=6,
-                     border_color=BORDER, fg_color=SURFACE, text_color=TEXT,
-                     placeholder_text="Nhập tên đăng nhập...",
-                     placeholder_text_color=MUTED).pack(fill="x", pady=(4, 14))
+        ctk.CTkLabel(
+            card,
+            text="Đăng nhập để xem các ghi chú của bạn trên thiết bị này.",
+            text_color=MUTED,
+            font=FONT_SMALL,
+            wraplength=360,
+        ).pack(padx=30, pady=(0, 22))
 
-        # Password
-        ctk.CTkLabel(inner, text="Mật khẩu", anchor="w",
-                     font=FONT_LABEL, text_color=TEXT).pack(fill="x")
-        ctk.CTkEntry(inner, height=38, corner_radius=6,
-                     border_color=BORDER, fg_color=SURFACE, text_color=TEXT,
-                     show="●",
-                     placeholder_text="Nhập mật khẩu...",
-                     placeholder_text_color=MUTED).pack(fill="x", pady=(4, 6))
+        ctk.CTkLabel(
+            card,
+            text="Tên đăng nhập",
+            anchor="w",
+            text_color=TEXT,
+            font=(FONT_FAMILY, 12, "bold"),
+        ).pack(fill="x", padx=32, pady=(0, 5))
 
-        # Thông báo lỗi (placeholder)
-        ctk.CTkLabel(inner, text="", text_color=ERROR_COLOR,
-                     font=FONT_TINY).pack(fill="x", pady=(0, 10))
+        self.username_entry = ctk.CTkEntry(
+            card,
+            height=40,
+            corner_radius=5,
+            border_color=BORDER,
+            fg_color=MAIN_BG,
+            text_color=TEXT,
+            placeholder_text="ten_dang_nhap",
+        )
+        self.username_entry.pack(fill="x", padx=32, pady=(0, 14))
 
-        # Nút đăng nhập → tạm thời vào thẳng MainView
-        ctk.CTkButton(inner, text="Đăng nhập", height=40, corner_radius=6,
-                      fg_color=ACCENT, hover_color=ACCENT_HOVER,
-                      text_color=("white", "#101820"),
-                      font=FONT_LABEL,
-                      command=self.on_login).pack(fill="x")
+        ctk.CTkLabel(
+            card,
+            text="Mật khẩu",
+            anchor="w",
+            text_color=TEXT,
+            font=(FONT_FAMILY, 12, "bold"),
+        ).pack(fill="x", padx=32, pady=(0, 5))
 
-        # Link → Đăng ký
-        row = ctk.CTkFrame(inner, fg_color="transparent")
-        row.pack(pady=(16, 0))
-        ctk.CTkLabel(row, text="Chưa có tài khoản?",
-                     font=FONT_SMALL, text_color=MUTED).pack(side="left")
-        ctk.CTkButton(row, text="Đăng ký", width=66, height=28,
-                      fg_color="transparent", hover_color=SURFACE_HOVER,
-                      text_color=ACCENT, font=("Segoe UI", 12, "bold"),
-                      border_width=0,
-                      command=self.on_register).pack(side="left", padx=(4, 0))
+        self.password_entry = ctk.CTkEntry(
+            card,
+            height=40,
+            corner_radius=5,
+            border_color=BORDER,
+            fg_color=MAIN_BG,
+            text_color=TEXT,
+            show="•",
+            placeholder_text="Nhập mật khẩu",
+        )
+        self.password_entry.pack(fill="x", padx=32, pady=(0, 12))
+
+        self.show_password = ctk.BooleanVar(value=False)
+        ctk.CTkCheckBox(
+            card,
+            text="Hiện mật khẩu",
+            variable=self.show_password,
+            text_color=MUTED,
+            fg_color=ACCENT,
+            hover_color=ACCENT,
+            font=FONT_TINY,
+            command=self._toggle_password_visibility,
+        ).pack(anchor="w", padx=32, pady=(0, 10))
+
+        self.error_label = ctk.CTkLabel(
+            card,
+            text=error,
+            text_color=ERROR_COLOR,
+            font=FONT_TINY,
+            wraplength=360,
+        )
+        self.error_label.pack(fill="x", padx=32, pady=(0, 8))
+
+        ctk.CTkButton(
+            card,
+            text="Đăng nhập",
+            height=42,
+            corner_radius=5,
+            fg_color=ACCENT,
+            hover_color=ACCENT_HOVER,
+            text_color=("white", "#101820"),
+            font=(FONT_FAMILY, 13, "bold"),
+            command=self._submit,
+        ).pack(fill="x", padx=32, pady=(0, 14))
+
+        ctk.CTkButton(
+            card,
+            text="Chưa có tài khoản?  Đăng ký",
+            height=32,
+            corner_radius=5,
+            fg_color="transparent",
+            hover_color=SURFACE_HOVER,
+            text_color=ACCENT,
+            font=FONT_TINY,
+            command=self.on_switch_register,
+        ).pack(fill="x", padx=32, pady=(0, 18))
+
+        self.mode_switch = ctk.CTkSwitch(
+            card,
+            text="Chế độ tối",
+            text_color=MUTED,
+            command=self._toggle_mode,
+            progress_color=ACCENT,
+            font=FONT_TINY,
+        )
+        if ctk.get_appearance_mode().lower() == "dark":
+            self.mode_switch.select()
+        self.mode_switch.pack(anchor="center", pady=(0, 22))
+
+    def _toggle_password_visibility(self):
+        self.password_entry.configure(show="" if self.show_password.get() else "•")
+
+    def _toggle_mode(self):
+        if callable(self.on_toggle_mode):
+            self.on_toggle_mode()
+        else:
+            ctk.set_appearance_mode("dark" if self.mode_switch.get() else "light")
+
+    def _submit(self):
+        username = self.username_entry.get().strip()
+        password = self.password_entry.get()
+        user, err = AuthController.login(username, password)
+        if isinstance(user, User):
+            self.error_label.configure(text="")
+            self.on_login(user)
+        else:
+            self.error_label.configure(text=err or "Tên đăng nhập hoặc mật khẩu không chính xác.")
