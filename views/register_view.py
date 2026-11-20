@@ -19,10 +19,10 @@ from controllers.auth_controller import AuthController
 
 
 class RegisterView(ctk.CTkFrame):
-    def __init__(self, master, on_register, on_switch_login, on_toggle_mode=None):
+    def __init__(self, master, on_register, on_back, on_toggle_mode=None):
         super().__init__(master, fg_color="transparent")
         self.on_register = on_register
-        self.on_switch_login = on_switch_login
+        self.on_back = on_back
         self.on_toggle_mode = on_toggle_mode
 
         self.grid_columnconfigure(0, weight=1)
@@ -181,7 +181,7 @@ class RegisterView(ctk.CTkFrame):
             hover_color=SURFACE_HOVER,
             text_color=ACCENT,
             font=FONT_TINY,
-            command=self.on_switch_login,
+            command=self.on_back,
         ).pack(fill="x", padx=32, pady=(0, 14))
 
         self.mode_switch = ctk.CTkSwitch(
@@ -195,6 +195,11 @@ class RegisterView(ctk.CTkFrame):
         if ctk.get_appearance_mode().lower() == "dark":
             self.mode_switch.select()
         self.mode_switch.pack(anchor="center", pady=(0, 20))
+
+        # Nhấn Enter ở ô nhập để đăng ký
+        for entry in (self.username_entry, self.fullname_entry, self.password_entry, self.confirm_entry):
+            entry.bind("<Return>", lambda _event: self._submit())
+        self.after(100, self.username_entry.focus_set)
 
     def _toggle_password_visibility(self):
         show_char = "" if self.show_password.get() else "•"
