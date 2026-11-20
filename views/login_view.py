@@ -1,3 +1,5 @@
+import inspect
+
 import customtkinter as ctk
 
 from config import (
@@ -20,10 +22,10 @@ from models.user import User
 
 
 class LoginView(ctk.CTkFrame):
-    def __init__(self, master, on_login, on_switch_register, on_toggle_mode=None, error: str = ""):
+    def __init__(self, master, on_login, on_register, on_toggle_mode=None, error: str = ""):
         super().__init__(master, fg_color="transparent")
         self.on_login = on_login
-        self.on_switch_register = on_switch_register
+        self.on_register = on_register
         self.on_toggle_mode = on_toggle_mode
 
         self.grid_columnconfigure(0, weight=1)
@@ -143,7 +145,7 @@ class LoginView(ctk.CTkFrame):
             hover_color=SURFACE_HOVER,
             text_color=ACCENT,
             font=FONT_TINY,
-            command=self.on_switch_register,
+            command=self.on_register,
         ).pack(fill="x", padx=32, pady=(0, 18))
 
         self.mode_switch = ctk.CTkSwitch(
@@ -158,6 +160,11 @@ class LoginView(ctk.CTkFrame):
             self.mode_switch.select()
         self.mode_switch.pack(anchor="center", pady=(0, 22))
 
+        # Nhấn Enter ở ô nhập để đăng nhập
+        for entry in (self.username_entry, self.password_entry):
+            entry.bind("<Return>", lambda _event: self._submit())
+        self.after(100, self.username_entry.focus_set)
+
     def _toggle_password_visibility(self):
         self.password_entry.configure(show="" if self.show_password.get() else "•")
 
@@ -167,12 +174,24 @@ class LoginView(ctk.CTkFrame):
         else:
             ctk.set_appearance_mode("dark" if self.mode_switch.get() else "light")
 
+    def _notify_login(self, user):
+        # Callback chuẩn là on_login(user). main.py hiện dùng bản tạm không nhận
+        # tham số (lambda: self.show_main()) nên gọi không đối số trong trường hợp đó.
+        try:
+            takes_user = len(inspect.signature(self.on_login).parameters) > 0
+        except (TypeError, ValueError):
+            takes_user = True
+        if takes_user:
+            self.on_login(user)
+        else:
+            self.on_login()
+
     def _submit(self):
         username = self.username_entry.get().strip()
         password = self.password_entry.get()
         user, err = AuthController.login(username, password)
         if isinstance(user, User):
             self.error_label.configure(text="")
-            self.on_login(user)
+            self._notify_login(user)
         else:
             self.error_label.configure(text=err or "Tên đăng nhập hoặc mật khẩu không chính xác.")
